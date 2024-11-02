@@ -1,0 +1,5 @@
+flight-planner-net/obj
+flight-planner-net/bin
+.idea/
+*.sln.ide
+*.sln.user
