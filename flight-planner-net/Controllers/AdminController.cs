@@ -10,11 +10,17 @@ namespace flight_planner_net.Controllers
     [Authorize]
     public class AdminController : ControllerBase
     {
+        private readonly FlightStorage _storage;
+        public AdminController(FlightStorage storage)
+        {
+            _storage = storage;
+        }
+        
         [HttpGet]
         [Route("flights/{id}")]
         public IActionResult GetFlight(int id)
         {
-            var flight = FlightStorage.GetAllFlights().FirstOrDefault(f => f.Id == id);
+            var flight = _storage.GetAllFlights().FirstOrDefault(f => f.Id == id);
             return flight != null ? Ok(flight) : NotFound();
         }
 
@@ -24,7 +30,7 @@ namespace flight_planner_net.Controllers
         {
             try
             {
-                FlightStorage.AddFlight(flight);
+                _storage.AddFlight(flight);
                 return Created("", flight);
             }
             catch (ArgumentException ex)
@@ -41,7 +47,7 @@ namespace flight_planner_net.Controllers
         [Route("flights/{id}")]
         public IActionResult DeleteFlight(int id)
         {
-            FlightStorage.DeleteFlight(id);
+            _storage.DeleteFlight(id);
             return Ok();
         }
     }
