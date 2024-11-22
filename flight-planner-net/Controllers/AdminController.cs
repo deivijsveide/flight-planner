@@ -1,5 +1,10 @@
+using AutoMapper;
+using flight_planner_net.Extensions;
 using flight_planner_net.Models;
-using flight_planner_net.Storage;
+using FlightPlanner.Services.Features.Flights.UseCases.Add;
+using FlightPlanner.Services.Features.Flights.UseCases.Delete;
+using FlightPlanner.Services.Features.Flights.UseCases.Get;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,39 +15,38 @@ namespace flight_planner_net.Controllers
     [Authorize]
     public class AdminController : ControllerBase
     {
+        private readonly IMapper _mapper;
+        private readonly IMediator _mediator;
+
+        public AdminController(IMapper mapper, IMediator mediator)
+        {
+            _mapper = mapper;
+            _mediator = mediator;
+        }
+
         [HttpGet]
         [Route("flights/{id}")]
-        public IActionResult GetFlight(int id)
+        public async Task<IActionResult> GetFlight(int id)
         {
-            var flight = FlightStorage.GetAllFlights().FirstOrDefault(f => f.Id == id);
-            return flight != null ? Ok(flight) : NotFound();
+            var result = await _mediator.Send(new GetFlightCommand { Id = id });
+            return this.ToActionResult(result);
         }
 
         [HttpPost]
         [Route("flights")]
-        public IActionResult AddFlight(Flight flight)
+        public async Task<IActionResult> AddFlight(FlightRequest request)
         {
-            try
-            {
-                FlightStorage.AddFlight(flight);
-                return Created("", flight);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return Conflict(ex.Message);
-            }
+            return this.ToActionResult(
+                await _mediator.Send(
+                    _mapper.Map<AddFlightCommand>(request)));
         }
 
         [HttpDelete]
         [Route("flights/{id}")]
-        public IActionResult DeleteFlight(int id)
+        public async Task<IActionResult> DeleteFlight(int id)
         {
-            FlightStorage.DeleteFlight(id);
-            return Ok();
+            var result = await _mediator.Send(new DeleteFlightCommand { Id = id });
+            return this.ToActionResult(result);
         }
     }
 }
