@@ -15,38 +15,45 @@ namespace flight_planner_net.Controllers
     [Authorize]
     public class AdminController : ControllerBase
     {
-        private readonly IMapper _mapper;
-        private readonly IMediator _mediator;
-
-        public AdminController(IMapper mapper, IMediator mediator)
+        private readonly FlightStorage _storage;
+        public AdminController(FlightStorage storage)
         {
-            _mapper = mapper;
-            _mediator = mediator;
+            _storage = storage;
         }
-
+        
         [HttpGet]
         [Route("flights/{id}")]
         public async Task<IActionResult> GetFlight(int id)
         {
-            var result = await _mediator.Send(new GetFlightCommand { Id = id });
-            return this.ToActionResult(result);
+            var flight = _storage.GetAllFlights().FirstOrDefault(f => f.Id == id);
+            return flight != null ? Ok(flight) : NotFound();
         }
 
         [HttpPost]
         [Route("flights")]
         public async Task<IActionResult> AddFlight(FlightRequest request)
         {
-            return this.ToActionResult(
-                await _mediator.Send(
-                    _mapper.Map<AddFlightCommand>(request)));
+            try
+            {
+                _storage.AddFlight(flight);
+                return Created("", flight);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
         }
 
         [HttpDelete]
         [Route("flights/{id}")]
         public async Task<IActionResult> DeleteFlight(int id)
         {
-            var result = await _mediator.Send(new DeleteFlightCommand { Id = id });
-            return this.ToActionResult(result);
+            _storage.DeleteFlight(id);
+            return Ok();
         }
     }
 }
