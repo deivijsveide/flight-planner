@@ -1,15 +1,20 @@
+using flight_planner_net.Database;
 using flight_planner_net.Models;
-using System.Collections.Concurrent;
+using Microsoft.EntityFrameworkCore;
 
 namespace flight_planner_net.Storage
 {
-    public static class FlightStorage
+    public class FlightStorage
     {
-        private static ConcurrentBag<Flight> _flights = new ConcurrentBag<Flight>();
-        private static int _id = 0;
+        private readonly FlightPlannerDbContext _context;
         private static readonly object _lock = new object();
 
-        public static void AddFlight(Flight flight)
+        public FlightStorage(FlightPlannerDbContext context)
+        {
+            _context = context;
+        }
+
+        public void AddFlight(Flight flight)
         {
             if (flight == null ||
                 flight.From == null ||
@@ -19,7 +24,7 @@ namespace flight_planner_net.Storage
                 string.IsNullOrWhiteSpace(flight.Carrier) ||
                 string.IsNullOrWhiteSpace(flight.DepartureTime) ||
                 string.IsNullOrWhiteSpace(flight.ArrivalTime) ||
-                flight.From.AirportCode.Trim().Equals(flight.To.AirportCode.Trim(), StringComparison.OrdinalIgnoreCase) ||
+                flight.From.AirportCode.Trim().ToLower() == flight.To.AirportCode.Trim().ToLower() ||
                 !DateTime.TryParse(flight.DepartureTime, out DateTime departureDate) ||
                 !DateTime.TryParse(flight.ArrivalTime, out DateTime arrivalDate) ||
                 departureDate >= arrivalDate)
@@ -29,59 +34,54 @@ namespace flight_planner_net.Storage
 
             lock (_lock)
             {
-                if (_flights.Any(existingFlight =>
-                    existingFlight.From.AirportCode.Equals(flight.From.AirportCode, StringComparison.OrdinalIgnoreCase) &&
-                    existingFlight.To.AirportCode.Equals(flight.To.AirportCode, StringComparison.OrdinalIgnoreCase) &&
+                var duplicate = _context.Flights.Any(existingFlight =>
+                    existingFlight.From.AirportCode.Trim().ToLower() == flight.From.AirportCode.Trim().ToLower() &&
+                    existingFlight.To.AirportCode.Trim().ToLower() == flight.To.AirportCode.Trim().ToLower() &&
                     existingFlight.DepartureTime == flight.DepartureTime &&
-                    existingFlight.ArrivalTime == flight.ArrivalTime))
+                    existingFlight.ArrivalTime == flight.ArrivalTime);
+
+                if (duplicate)
                 {
                     throw new InvalidOperationException("Duplicate flight.");
                 }
 
-                flight.Id = ++_id;
-                _flights.Add(flight);
+                _context.Flights.Add(flight);
+                _context.SaveChanges();
             }
         }
 
-        public static void ClearFlights()
+        public void ClearFlights()
         {
-            _flights = new ConcurrentBag<Flight>();
+            _context.Flights.RemoveRange(_context.Flights);
+            _context.Airports.RemoveRange(_context.Airports);
+            _context.SaveChanges();
         }
 
-        public static IEnumerable<Flight> GetAllFlights()
+        public IEnumerable<Flight> GetAllFlights()
         {
-            return _flights.ToList();
+            return _context.Flights
+                .Include(f => f.From)
+                .Include(f => f.To)
+                .ToList();
         }
 
-        public static void DeleteFlight(int id)
+        public void DeleteFlight(int id)
         {
-            var updatedFlights = new ConcurrentBag<Flight>();
-            bool flightFound = false;
-
-            foreach (var flight in _flights)
+            var flight = _context.Flights.FirstOrDefault(f => f.Id == id);
+            if (flight != null)
             {
-                if (flight.Id == id)
-                {
-                    flightFound = true;
-                }
-                else
-                {
-                    updatedFlights.Add(flight);
-                }
-            }
-
-            if (flightFound)
-            {
-                _flights = updatedFlights;
+                _context.Flights.Remove(flight);
+                _context.SaveChanges();
             }
         }
 
-        public static IEnumerable<Airport> SearchAirports(string phrase)
+        public IEnumerable<Airport> SearchAirports(string phrase)
         {
             phrase = phrase.Trim().ToLower();
 
-            return _flights
-                .SelectMany(flight => new[] { flight.From, flight.To })
+            var airports = _context.Airports.ToList();
+
+            return airports
                 .Where(airport =>
                     airport.AirportCode.ToLower().Contains(phrase) ||
                     airport.City.ToLower().Contains(phrase) ||
@@ -90,7 +90,7 @@ namespace flight_planner_net.Storage
                 .ToList();
         }
 
-        public static IEnumerable<Flight> SearchFlights(SearchFlightsRequest request)
+        public IEnumerable<Flight> SearchFlights(SearchFlightsRequest request)
         {
             if (request == null ||
                 string.IsNullOrWhiteSpace(request.From) ||
@@ -110,11 +110,17 @@ namespace flight_planner_net.Storage
                 throw new ArgumentException("Invalid departure date.");
             }
 
-            return _flights.Where(f =>
-                f.From.AirportCode.Equals(request.From, StringComparison.OrdinalIgnoreCase) &&
-                f.To.AirportCode.Equals(request.To, StringComparison.OrdinalIgnoreCase) &&
-                DateTime.TryParse(f.DepartureTime, out DateTime flightDeparture) &&
-                flightDeparture.Date == departureDate.Date);
+            var flights = _context.Flights
+                .Include(f => f.From)
+                .Include(f => f.To)
+                .ToList();
+
+            return flights
+                .Where(f =>
+                    f.From.AirportCode.Equals(request.From, StringComparison.OrdinalIgnoreCase) &&
+                    f.To.AirportCode.Equals(request.To, StringComparison.OrdinalIgnoreCase) &&
+                    DateTime.Parse(f.DepartureTime).Date == departureDate.Date)
+                .ToList();
         }
     }
 }

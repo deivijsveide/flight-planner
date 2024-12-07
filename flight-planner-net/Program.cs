@@ -1,5 +1,8 @@
+using flight_planner_net.Database;
 using flight_planner_net.Handlers;
+using flight_planner_net.Storage;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.EntityFrameworkCore;
 
 namespace flight_planner_net
 {
@@ -17,7 +20,11 @@ namespace flight_planner_net
                     .AllowAnyMethod()
                     .AllowAnyHeader();
             }));
-
+            builder.Services.AddDbContext<FlightPlannerDbContext>(
+                options => options.UseSqlServer(builder.Configuration.GetConnectionString("flight-planner")));
+            builder.Services.AddScoped<FlightStorage>();
+            
+            
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();

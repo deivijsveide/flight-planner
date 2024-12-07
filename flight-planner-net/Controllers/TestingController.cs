@@ -7,11 +7,17 @@ namespace flight_planner_net.Controllers
     [ApiController]
     public class TestingController : ControllerBase
     {
+        private readonly FlightStorage _storage;
+        public TestingController(FlightStorage storage)
+        {
+            _storage = storage;
+        }
+        
         [HttpPost]
         [Route("Clear")]
         public IActionResult Clear()
         {
-            FlightStorage.ClearFlights();
+            _storage.ClearFlights();
             return Ok();
         }
     }
