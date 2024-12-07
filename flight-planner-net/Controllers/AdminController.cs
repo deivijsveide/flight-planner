@@ -1,5 +1,10 @@
+using AutoMapper;
+using flight_planner_net.Extensions;
 using flight_planner_net.Models;
-using flight_planner_net.Storage;
+using FlightPlanner.Services.Features.Flights.UseCases.Add;
+using FlightPlanner.Services.Features.Flights.UseCases.Delete;
+using FlightPlanner.Services.Features.Flights.UseCases.Get;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,7 +23,7 @@ namespace flight_planner_net.Controllers
         
         [HttpGet]
         [Route("flights/{id}")]
-        public IActionResult GetFlight(int id)
+        public async Task<IActionResult> GetFlight(int id)
         {
             var flight = _storage.GetAllFlights().FirstOrDefault(f => f.Id == id);
             return flight != null ? Ok(flight) : NotFound();
@@ -26,7 +31,7 @@ namespace flight_planner_net.Controllers
 
         [HttpPost]
         [Route("flights")]
-        public IActionResult AddFlight(Flight flight)
+        public async Task<IActionResult> AddFlight(FlightRequest request)
         {
             try
             {
@@ -45,7 +50,7 @@ namespace flight_planner_net.Controllers
 
         [HttpDelete]
         [Route("flights/{id}")]
-        public IActionResult DeleteFlight(int id)
+        public async Task<IActionResult> DeleteFlight(int id)
         {
             _storage.DeleteFlight(id);
             return Ok();
