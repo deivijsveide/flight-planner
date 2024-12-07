@@ -1,5 +1,11 @@
 flight-planner-net/obj
 flight-planner-net/bin
+FlightPlanner.Core/obj
+FlightPlanner.Core/bin
+FlightPlanner.Data/obj
+FlightPlanner.Data/bin
+FlightPlanner.Services/obj
+FlightPlanner.Services/bin
 .idea/
 *.sln.ide
 *.sln.user
