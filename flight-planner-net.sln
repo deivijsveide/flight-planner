@@ -1,6 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "flight-planner-net", "flight-planner-net\flight-planner-net.csproj", "{FF7A77D7-A082-4BCE-8E99-A18B13DD389B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "flight-planner-net", "flight-planner-net\flight-planner-net.csproj", "{D7C2F733-3FEF-4588-A168-D822EAA0C8DB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlightPlanner.Core", "FlightPlanner.Core\FlightPlanner.Core.csproj", "{ECD215F9-928F-4A30-8DF1-3604B092DCAB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlightPlanner.Data", "FlightPlanner.Data\FlightPlanner.Data.csproj", "{7D8AB7EB-A952-43AA-9848-BEAFA0D4BBAD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlightPlanner.Services", "FlightPlanner.Services\FlightPlanner.Services.csproj", "{DC500538-1BDF-4C40-BDF6-9BB96B663C96}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -8,9 +14,5 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{FF7A77D7-A082-4BCE-8E99-A18B13DD389B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FF7A77D7-A082-4BCE-8E99-A18B13DD389B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FF7A77D7-A082-4BCE-8E99-A18B13DD389B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FF7A77D7-A082-4BCE-8E99-A18B13DD389B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
