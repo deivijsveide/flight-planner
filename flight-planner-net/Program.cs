@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 using System.Reflection;
 using FlightPlanner.Data;
 using flight_planner_net.Handlers;
@@ -11,11 +10,6 @@ using FlightPlanner.Services.Features.Flights.UseCases.Delete;
 using FlightPlanner.Services.Features.Flights.UseCases.Get;
 using FluentValidation;
 using MediatR;
-=======
-using flight_planner_net.Database;
-using flight_planner_net.Handlers;
-using flight_planner_net.Storage;
->>>>>>> main
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 
@@ -36,7 +30,6 @@ namespace flight_planner_net
                     .AllowAnyMethod()
                     .AllowAnyHeader();
             }));
-<<<<<<< HEAD
 
             builder.Services.AddDbContext<FlightPlannerDbContext>(
                 options => options.UseSqlServer(builder.Configuration.GetConnectionString("flight-planner")));
@@ -61,13 +54,6 @@ namespace flight_planner_net
 
             builder.Services.AddServices();
 
-=======
-            builder.Services.AddDbContext<FlightPlannerDbContext>(
-                options => options.UseSqlServer(builder.Configuration.GetConnectionString("flight-planner")));
-            builder.Services.AddScoped<FlightStorage>();
-            
-            
->>>>>>> main
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();

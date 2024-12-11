@@ -8,13 +8,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-<<<<<<< HEAD
         <PackageReference Include="AutoMapper" Version="13.0.1" />
         <PackageReference Include="FluentValidation" Version="11.11.0" />
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
         <PackageReference Include="MediatR" Version="12.4.1" />
-=======
->>>>>>> main
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.10" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.10">
           <PrivateAssets>all</PrivateAssets>
@@ -30,9 +27,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\FlightPlanner.Core\FlightPlanner.Core.csproj" />
-      <ProjectReference Include="..\FlightPlanner.Data\FlightPlanner.Data.csproj" />
-      <ProjectReference Include="..\FlightPlanner.Services\FlightPlanner.Services.csproj" />
+        <ProjectReference Include="..\FlightPlanner.Core\FlightPlanner.Core.csproj" />
+        <ProjectReference Include="..\FlightPlanner.Data\FlightPlanner.Data.csproj" />
+        <ProjectReference Include="..\FlightPlanner.Services\FlightPlanner.Services.csproj" />
     </ItemGroup>
 
 </Project>
